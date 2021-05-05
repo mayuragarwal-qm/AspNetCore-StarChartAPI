@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StarChart.Models
 {
@@ -11,7 +12,7 @@ namespace StarChart.Models
         public string Name { get; set; }
         public int? OrbitedObjectId { get; set; }
         public TimeSpan OrbitalPeriod { get; set; }
-
+        [NotMapped]
         public List<CelestialObject> Satellites { get; set; }
     }
 }
