@@ -63,6 +63,64 @@ namespace StarChart.Controllers
             return Ok(celestialObjects);
         }
 
+        [HttpPost]
+        public IActionResult Create([FromBody] CelestialObject celestialObject)
+        {
+            _context.CelestialObjects.Add(celestialObject);
+            _context.SaveChanges();
+
+            return CreatedAtRoute("GetById", new {id = celestialObject.Id});
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] CelestialObject celestialObject)
+        {
+            var celestialObjectFromDb = _context.CelestialObjects.FirstOrDefault(o => o.Id == id);
+
+            if (celestialObjectFromDb == null)
+                return NotFound();
+
+            celestialObjectFromDb.Name = celestialObject.Name;
+            celestialObjectFromDb.OrbitalPeriod = celestialObject.OrbitalPeriod;
+            celestialObjectFromDb.OrbitedObjectId = celestialObject.OrbitedObjectId;
+
+            _context.CelestialObjects.Update(celestialObjectFromDb);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpPatch("{id}/{name}")]
+        public IActionResult RenameObject(int id, string name)
+        {
+            var celestialObjectFromDb = _context.CelestialObjects.FirstOrDefault(o => o.Id == id);
+
+            if (celestialObjectFromDb == null)
+                return NotFound();
+
+            celestialObjectFromDb.Name = name;
+
+            _context.CelestialObjects.Update(celestialObjectFromDb);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var celestialObjectsFromDb = _context.CelestialObjects
+                .Where(o => o.Id == id || o.OrbitedObjectId == id).ToList();
+
+            if (celestialObjectsFromDb.Count == 0)
+                return NotFound();
+
+            _context.CelestialObjects.RemoveRange(celestialObjectsFromDb);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
         private List<CelestialObject> GetSatellitesOfCelestialObject(int celestialObjectId)
         {
             return _context.CelestialObjects
